@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Reddit Bubble Timeline</title>
+	<link rel="stylesheet" href="node_modules/spectre.css/dist/spectre.min.css" />
 	<style>
 		.bub{
 			opacity: 0.5;
@@ -12,11 +13,33 @@
 <body>
 	<div id="root">
 		<p>Top Reddit Posts by Month</p>
-		<form id="mainform">
-			<input id="subreddit" type="text">
-			<input id="submitbutton" type="submit" value="Submit" >
+		<form id="mainform centered">
+			<div class="btn-group">
+				<button class="btn yearselect" value="2017">2017td</button>
+				<button class="btn yearselect" value="2016">2016</button>
+				<button class="btn yearselect" value="2015">2015</button>
+				<button class="btn yearselect" value="2014">2014</button>
+				<button class="btn yearselect" value="2013">2013</button>
+				<button class="btn yearselect" value="2012">2012</button>
+			</div>
+			<br/>
+			<div class="btn-group">
+				<button class="btn articleCount" id="plusArtCt" value="plus">+</button>
+				<button disabled id="articleCountIndicator">0</button>
+				<button class="btn articleCount" id="minusArtCt">-</button>
+			</div>
+			<input id="submitbutton" type="submit" value="Update" >
+			</div>
+			
 		</form>
+
+		<!--fixed svg header/x-axis labels -->
+		
+		<!--scrolling svg group -->
+
+		<!-- footer -->
+		
 	</div>
-	<script src="index.js"></script>
+	<script src="dist/bundle.js"></script>
 </body>
 </html>
