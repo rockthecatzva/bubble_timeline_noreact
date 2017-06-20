@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   var selectedYear=2017;
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
   var start, stop;
-  var subreddits = ["news", "politics", "worldnews", "television", "The_Donald", "politics"];
+  var subreddits = ["news", "politics", "worldnews", "television", "politics"];
   //var subreddits = ["news"];
   var rawdata = [];
 
@@ -14,17 +14,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
     baseurl = "https://www.reddit.com/r/";
     endurl = "/search.json?sort=top&limit="+articleCount+"&q=timestamp%3A"+(Math.trunc(start.getTime()/1000)) +".."+(Math.trunc(stop.getTime()/1000))+"&restrict_sr=on&syntax=cloudsearch";
 
-    var p= Promise.all(subreddits.map((sub)=>{
+    var p= Promise.all(subreddits.map(sub=>{
         url = baseurl + sub + endurl;
-        console.log(url);
-        return fetch(url).then(response => response.json().then(dat=>{return dat.data.children}))
-    })).then((val) => {
+        return fetch(url).then(response => response.json().then(dat=>{return dat.data.children.map(art=>{return {"url": art.data["url"], "score": art.data["score"], "ups": art.data["ups"], "date": art.data["created_utc"], "downs": art.data["downs"], "title": art.data["title"], "comments": art.data["num_comments"]}})}))
+    })).then(val => {
       console.log("ALL LOADED!!!", val);
-        return (val).map((v)=>{console.log(v)});
-        
         })
     
-
+//return {"url": d.data["url"], "score": d["score"], "ups": d["ups"], "date": d["created_utc"], "downs": d["downs"], "title": d["title"], "comments": d["num_comments"]}
   
 
     /*
