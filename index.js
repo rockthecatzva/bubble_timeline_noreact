@@ -19,8 +19,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
       url = baseurl + sub + endurl;
       return fetch(url).then(response => response.json().then(dat => { return dat.data.children.map(art => { return { "url": art.data["url"], "score": art.data["score"], "ups": art.data["ups"], "date": art.data["created_utc"], "downs": art.data["downs"], "title": art.data["title"], "comments": art.data["num_comments"] } }) }))
     })).then(val => {
-      console.log("ALL LOADED!!!", val);
+      console.log("ALL LOADED!!!", document.getElementById("svg-header").width);
+      document.getElementById("svg-main").innerHTML = "";
+
       drawTimelines(val[0], document.getElementById("svg-main"), [start, stop]);
+      drawScaleLines(document.getElementById("svg-header"), [start, stop])
     })
   }
 
@@ -78,11 +81,40 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 
   let drawScaleLines = function (svgTarget, dates) {
-    /*
+      let svg = d3.select(svgTarget).append("svg"),
+          width = d3.select(svgTarget).node().getBoundingClientRect().width;
+          console.log(width);
+      svg.attr("width", width);
+
+      var x = d3.scaleTime()
+        .domain([new Date(dates[0]), new Date(dates[1])])
+        .range([0, width]);
+
+      var xAxis = d3.axisBottom(x)
+          .ticks(d3.timeMonths(new Date(dates[0]), new Date(dates[1])).range)
+          .tickSize(16, 0)
+          .tickFormat(d3.timeFormat("%B"));
+
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0,0)")
+        .call(xAxis)
+      .selectAll(".tick text")
+        .style("text-anchor", "start")
+        .attr("x", 6)
+        .attr("y", 6);
+      /*
         let xlabels = []
-        for (var index = 0; index < (stopYear - startYear); index++) {
+        let monthDiff = function(d1, d2) {
+            var months;
+            months = (d2.getFullYear() - d1.getFullYear()) * 12;
+            months -= d1.getMonth() + 1;
+            months += d2.getMonth();
+            return months <= 0 ? 0 : months;
+        }
+
+        for (var index = 0; index < monthDiff(new Date(dates[0]), new Date(dates[1])); index++) {
           xlabels.push(startYear + index);
-    
         }
     
         var xAxis = d3.axisBottom(x);
@@ -97,15 +129,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
           .attr("class", "xaxis")
           .attr("transform", "translate(0," + (height - MARGIN) + ")")
           .call(xAxis);
-    
+
           */
+    
+          
   }
 
   let drawTimelines = function (data, svgTarget, dates) {
     console.log("drawing the timelines");
-
     //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
-
 
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
@@ -117,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     let margin = { top: 20, right: 30, bottom: 40, left: 0 };
     let height = 100,
       MARGIN = 10,
-      MAXBALLOON_SIZE = 40;
+      MAXBALLOON_SIZE = 30;
 
     let containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
       containerH = parseInt((window.getComputedStyle(svgTarget).height).replace("px", ""));
@@ -131,8 +163,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
       .range([10, (containerW - margin.left - margin.right)])
       .interpolate(d3.interpolateRound)
 
-    //console.log("????", start.getTime()/1000, stop.getTime()/1000);
-
     svg.selectAll(".bubbles").remove()
     var bubble = svg.selectAll(".bubbles")
       .data(data)
@@ -141,18 +171,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
     
     bubble.append("circle")
       .attr("class", "bub")
-      .attr("fill", "steelblue")
       .attr("r", (d) => {return (d["ups"]/maxval) * MAXBALLOON_SIZE });
 
     bubble.append("text")
-      .attr("y", 0)
+      .attr("y", -40)
       .attr("x", 0)
       .attr("text-anchor", "middle")
       .text((d) => {
         let date = new Date(d["date"]*1000);
-
-        console.log(date.getMonth()+1, date.getDate()+1);
-        return ((date.getMonth()+1) +"/"+ (date.getDate()+1)) 
+        return ((date.getMonth()+1) +"/"+ (date.getDate()+1));
         });
 
   
