@@ -1,0 +1,80 @@
+@font-face {
+    font-family: mainfont;
+    src: url('fonts/GothamNarrow-Book.otf');
+}
+
+body {
+    background-color: #eaeaea;
+    font-family: mainfont;
+}
+
+svg:not(:root) {
+    overflow: visible;
+}
+
+.tick line {
+stroke: #c5c5c5;
+}
+
+.bub {
+stroke: #eaeaea;
+fill: black;
+stroke-width: 1;
+shape-rendering: crispEdges;
+}
+
+.yearselect {
+color: red;
+}
+
+.greyout {
+color: grey;
+}
+
+.btn-group{
+margin-bottom: 5px;
+}
+
+#svg-header {
+background-color: #eaeaea;
+height: 140px;
+}
+
+#svg-main {
+height: 1000px;
+position: relative;
+overflow: visible;
+}
+
+.hide {
+display: none;
+}
+
+.show {
+display: inherit;
+}
+
+.textbubble {
+fill: white;
+font-size: 0.8em;
+width: 150px;
+height: 100px;
+max-height: 120px;
+overflow: hidden;
+}
+
+.bubtext {
+background-color: white;
+}
+
+.horiz-line{
+stroke: black;
+}
+
+.subreddit-label{
+    color: black;
+    background-color: white;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 2px;
+}
