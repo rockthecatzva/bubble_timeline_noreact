@@ -24,15 +24,17 @@ shape-rendering: crispEdges;
 }
 
 .yearselect {
-color: red;
+    background-color: white;
+    border-color: black;
 }
 
 .greyout {
-color: grey;
+    color: grey;
+    background-color: #eaeaea;
 }
 
 .btn-group{
-margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 #svg-header {
@@ -77,4 +79,22 @@ stroke: black;
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 2px;
+}
+
+
+
+.year-footnote{
+    font-size: 0.8em;
+}
+
+#articleCountIndicator, #submitbutton{
+    background-color: white;
+}
+
+.center-text{
+    text-align: center;
+}
+
+#formbox{
+    margin: auto;
 }

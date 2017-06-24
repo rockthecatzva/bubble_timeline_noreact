@@ -1,7 +1,7 @@
 let d3 = require('d3');
 
 document.addEventListener("DOMContentLoaded", function (event) {
-  let articleCount = 20;
+  let articleCount = 10;
   let selectedYear = 2017;
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
   let start, stop;
