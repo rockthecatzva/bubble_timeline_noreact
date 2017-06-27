@@ -5,6 +5,15 @@
 	<title>Reddit Bubble Timeline</title>
 	<link rel="stylesheet" href="node_modules/spectre.css/dist/spectre.min.css" />
 	<link rel="stylesheet" href="style.css" />
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-15876167-6', 'auto');
+		ga('send', 'pageview');
+	</script>
 </head>
 
 <body class="container">
@@ -16,6 +25,7 @@
 		<div id="formbox" class="column col-3">
 			
 			<form id="mainform centered">
+				<div class="instruct">1. Select a year.</div>
 				<div class="btn-group">
 					<button class="btn yearselect" value="2017">2017*</button>
 					<button class="btn yearselect" value="2016">2016</button>
@@ -25,12 +35,17 @@
 					<button class="btn yearselect" value="2012">2012</button>
 				</div>
 				<div class="year-footnote">*2017 is year to-date</div>
-				<br/>
-				<div class="btn-group">
-					<button class="btn articleCount" id="plusArtCt" value="plus">+</button>
-					<button disabled id="articleCountIndicator">0</button>
-					<button class="btn articleCount" id="minusArtCt">-</button>
+				
+				<div class="instruct">2. Choose the number of posts per year:</div> 
+				<div class="centerdiv">
+					<div class="btn-group centerdiv">
+						<button class="btn articleCount" id="plusArtCt" value="plus">+</button>
+						<button disabled id="articleCountIndicator">0</button>
+						<button class="btn articleCount" id="minusArtCt">-</button>
+					</div>
 				</div>
+
+				<div class="instruct">3. Press update button</div>
 				<input id="submitbutton" type="submit" value="Update">
 			</form>
 		</div>

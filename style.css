@@ -13,19 +13,20 @@ svg:not(:root) {
 }
 
 .tick line {
-stroke: #c5c5c5;
+    stroke: #c5c5c5;
 }
 
 .bub {
-stroke: #eaeaea;
-fill: black;
-stroke-width: 1;
-shape-rendering: crispEdges;
+    stroke: #eaeaea;
+    fill: black;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
 }
 
 .yearselect {
     background-color: white;
-    border-color: black;
+    border-color: #50596c;
+    color: #50596c;
 }
 
 .greyout {
@@ -38,50 +39,39 @@ shape-rendering: crispEdges;
 }
 
 #svg-header {
-background-color: #eaeaea;
-height: 140px;
+    background-color: #eaeaea;
+    height: 140px;
 }
 
 #svg-main {
-height: 1000px;
-position: relative;
-overflow: visible;
+    height: 1000px;
+    position: relative;
+    overflow: visible;
 }
 
-.hide {
-display: none;
-}
 
 .show {
-display: inherit;
+    display: inherit;
 }
 
 .textbubble {
-fill: white;
-font-size: 0.8em;
-width: 150px;
-height: 100px;
-max-height: 120px;
-overflow: hidden;
+    fill: white;
+    font-size: 0.8em;
+    width: 150px;
+    height: 100px;
+    max-height: 120px;
+    overflow: hidden;
 }
 
-.bubtext {
-background-color: white;
-}
 
 .horiz-line{
-stroke: black;
+    stroke: black;
 }
 
 .subreddit-label{
-    color: black;
-    background-color: white;
-    padding-left: 2px;
-    padding-right: 2px;
-    padding-bottom: 2px;
+    color: blue;
+    font-size: 1.3em;
 }
-
-
 
 .year-footnote{
     font-size: 0.8em;
@@ -89,6 +79,12 @@ stroke: black;
 
 #articleCountIndicator, #submitbutton{
     background-color: white;
+    color: #50596c;
+}
+
+.articleCount{
+    color: #50596c;
+    border-color: #50596c;
 }
 
 .center-text{
@@ -97,4 +93,28 @@ stroke: black;
 
 #formbox{
     margin: auto;
+}
+
+.bubcontainer{
+    background-color: white;
+    y: -100%;
+}
+
+.bubdate, .bubpoints {
+    text-align: center;
+}
+
+.instruct{
+    padding-top: 1em;
+    font-size: 1.2em;    
+}
+
+
+.fullw{
+    width: 100%;
+}
+
+.centerdiv{
+    width: 100%;
+    margin: 0 auto;
 }

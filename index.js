@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
   //let subreddits = ["news"];
   let rawdata = [];
+  
+
+  
+
+
 
   document.getElementById("submitbutton").onclick = function (event) {
     event.preventDefault();
@@ -24,7 +29,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
                                      "ups": art.data["ups"], 
                                      "date": art.data["created_utc"], 
                                      "downs": art.data["downs"], 
-                                     "title": art.data["title"], 
+                                     "title": art.data["title"],
+                                     //"image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
                                      "comments": art.data["num_comments"] } }) }))
     })).then(val => {
       console.log("ALL LOADED!!!", document.getElementById("svg-header").width);
@@ -114,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let drawTimelines = function (svgTarget, dates, dataSets) {
 
     //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
-
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
     let margin = { top: 20, right: 30, bottom: 40, left: 0 };
@@ -182,17 +188,27 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .on("mouseout", onRollOff);
 
       bubble.append("foreignObject")
-        .attr("class", "textbubble hide")
-        .attr("y", -110)
-        .attr("x", -75)
+        .attr("class", "textbubble hide")//.attr("class", "textbubble hide")
+        .attr("y", 0)
+        .attr("x", 0)
         .attr("text-anchor", "middle")
         .html((d) => {
           let date = new Date(d["date"] * 1000);
-          return ("<div class='bubtext'>(" + (date.getMonth() + 1) + "/" + (date.getDate() + 1) + ") " + d["title"] + "</div>");
+
+          let bubbleObj = "<table class='bubcontainer'>";
+          bubbleObj+= "<tr><td class='bubdate'>"+ (months[date.getMonth()]) + "-" + (date.getDate() + 1) + "</td> <td class='bubpoints'>"; 
+          bubbleObj+= Math.round(d["score"]/1000)+"k points</td></tr>";
+          bubbleObj+="<tr class='bubtext'><td colspan='2'>" + d["title"] + "</td></tr>";
+          bubbleObj+= "</table>";
+
+          return bubbleObj;
         });
     });
-
-
-
   }
+
+
+
+
+
+
 });
