@@ -33,10 +33,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
                                      //"image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
                                      "comments": art.data["num_comments"] } }) }))
     })).then(val => {
-      console.log("ALL LOADED!!!", document.getElementById("svg-header").width);
+      //console.log("ALL LOADED!!!", document.getElementById("svg-header").width);
       document.getElementById("svg-main").innerHTML = "";
-      document.getElementById("svg-header").innerHTML = "";
-
+      ///document.getElementById("svg-header").innerHTML = "";
       drawTimelines(document.getElementById("svg-main"), [start, stop], val);
       //drawScaleLines(document.getElementById("svg-header"), [start, stop])
     })
@@ -197,11 +196,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
       let onRollOver = function (d, i) {
         let t = d3.select(this.parentNode)
         t.selectAll("g > .textbubble").attr("class", "textbubble show");
+        t.selectAll("g > .bubble").attr("class", "bubble-highlight");
+        console.log(t);
       }
 
       let onRollOff = function (d, i) {
         let t = d3.select(this.parentNode)
         t.select("g > .textbubble").attr("class", "textbubble hide");
+        t.selectAll("g > .bubble-highlight").attr("class", "bubble");
       }
 
       bubble = svg.selectAll(".bubbles")
@@ -210,27 +212,33 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("transform", function (d, i) { return "translate(" + x(d["date"]) + "," + (ypos + ROW_GAP * setnum) + ")"; });
 
       bubble.append("circle")
-        .attr("class", "bub")
+        .attr("class", "bubble")
         .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
         .on("mouseover", onRollOver)
         .on("mouseout", onRollOff);
 
-      bubble.append("foreignObject")
+      let t = bubble.append("text")
         .attr("class", "textbubble hide")//.attr("class", "textbubble hide")
         .attr("y", 0)
         .attr("x", 0)
-        .attr("text-anchor", "middle")
-        .html((d) => {
+        .attr("dx", 20)
+        .attr("text-anchor", "left")
+        .text((d) => {
           let date = new Date(d["date"]);
-
+          let bubbleObj = (months[date.getMonth()]) + "-" + (date.getDate() + 1) + " " + d["title"];
+          /*
           let bubbleObj = "<table class='bubcontainer'>";
           bubbleObj+= "<tr><td class='bubdate'>"+ (months[date.getMonth()]) + "-" + (date.getDate() + 1) + "</td> <td class='bubpoints'>"; 
           bubbleObj+= Math.round(d["score"]/1000)+"k points</td></tr>";
           bubbleObj+="<tr class='bubtext'><td colspan='2'>" + d["title"] + "</td></tr>";
           bubbleObj+= "</table>";
+          */
+          //let bubbleObj = " this is a <tspan>test</tspan> system";
 
           return bubbleObj;
         });
+
+
     });
   }
 

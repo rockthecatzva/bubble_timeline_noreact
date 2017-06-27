@@ -16,7 +16,14 @@ svg:not(:root) {
     stroke: #c5c5c5;
 }
 
-.bub {
+.bubble-highlight {
+    fill: blue;
+        stroke-width: 1;
+    shape-rendering: crispEdges;
+        stroke: #eaeaea;
+}
+
+.bubble {
     stroke: #eaeaea;
     fill: black;
     stroke-width: 1;
@@ -56,6 +63,7 @@ svg:not(:root) {
 
 .textbubble {
     fill: white;
+    stroke: black;
     font-size: 0.8em;
     width: 150px;
     height: 100px;
@@ -109,12 +117,14 @@ svg:not(:root) {
     font-size: 1.2em;    
 }
 
-
 .fullw{
     width: 100%;
 }
 
-.centerdiv{
-    width: 100%;
-    margin: 0 auto;
+.yearbox{
+    width: 275px;
+}
+
+.articlecountbox{
+    width: 78px;
 }
