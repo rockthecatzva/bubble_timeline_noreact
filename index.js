@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                           { return { "url": art.data["url"], 
                                      "score": art.data["score"], 
                                      "ups": art.data["ups"], 
-                                     "date": art.data["created_utc"], 
+                                     "date": art.data["created_utc"]*1000, 
                                      "downs": art.data["downs"], 
                                      "title": art.data["title"],
                                      //"image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       document.getElementById("svg-header").innerHTML = "";
 
       drawTimelines(document.getElementById("svg-main"), [start, stop], val);
-      drawScaleLines(document.getElementById("svg-header"), [start, stop])
+      //drawScaleLines(document.getElementById("svg-header"), [start, stop])
     })
   }
 
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
     let margin = { top: 20, right: 30, bottom: 40, left: 0 };
-    let height = 100,
+    let height = 10,
       MARGIN = 10,
       MAXBALLOON_SIZE = 30,
       ROW_GAP = 100,
@@ -136,11 +136,39 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.attr("class", "svg");
     svg.attr("width", containerW)
       .attr("height", containerH);
-
+    
+    
+    /*
     var x = d3.scaleLinear()
-      .domain([start.getTime() / 1000, stop.getTime() / 1000])
+      .domain([start.getTime(), stop.getTime()])
       .range([10, (containerW - margin.left - margin.right)])
       .interpolate(d3.interpolateRound)
+    */
+    console.log(start, stop)
+    
+
+    var x = d3.scaleTime()
+      .domain([(start),(stop)])
+      .range([0, containerW]);
+
+    var xAxis = d3.axisBottom(x)
+      .ticks(d3.timeMonths((start),(stop)).range)
+      .tickSize(12, 0)
+      .tickFormat(d3.timeFormat("%B"));
+
+    var bubbleGroup = svg.append("g")
+      .attr("class", "x axis")
+      .style("font-family", "mainfont")
+      .attr("transform", "translate(0," + (height - 20) + ")")
+      .call(xAxis);
+
+    bubbleGroup.selectAll(".tick text")
+      .style("text-anchor", "start")
+      .attr("x", 6)
+      .attr("y", 6);
+
+
+
 
     svg.selectAll(".bubbles").remove()
     var bubble, maxval, textbubble;
@@ -179,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       bubble = svg.selectAll(".bubbles")
         .data(data)
         .enter().append("g")
-        .attr("transform", function (d, i) { return "translate(" + x(new Date(d["date"])) + "," + (ypos + ROW_GAP * setnum) + ")"; });
+        .attr("transform", function (d, i) { return "translate(" + x(d["date"]) + "," + (ypos + ROW_GAP * setnum) + ")"; });
 
       bubble.append("circle")
         .attr("class", "bub")
@@ -193,7 +221,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("x", 0)
         .attr("text-anchor", "middle")
         .html((d) => {
-          let date = new Date(d["date"] * 1000);
+          let date = new Date(d["date"]);
 
           let bubbleObj = "<table class='bubcontainer'>";
           bubbleObj+= "<tr><td class='bubdate'>"+ (months[date.getMonth()]) + "-" + (date.getDate() + 1) + "</td> <td class='bubpoints'>"; 
