@@ -20,7 +20,7 @@ svg:not(:root) {
     fill: blue;
         stroke-width: 1;
     shape-rendering: crispEdges;
-        stroke: #eaeaea;
+        stroke: #eaeaea;    
 }
 
 .bubble {
@@ -127,4 +127,10 @@ svg:not(:root) {
 
 .articlecountbox{
     width: 78px;
+}
+
+.card-container{
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
 }

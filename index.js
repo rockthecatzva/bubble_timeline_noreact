@@ -6,11 +6,25 @@ document.addEventListener("DOMContentLoaded", function (event) {
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
-  //let subreddits = ["news"];
-  let rawdata = [];
-  
 
+  console.log(document.getElementById("closeCardBtn").onclick);
+  document.getElementById("closeCardBtn").onclick = closeCard;
+    console.log(document.getElementById("closeCardBtn").onclick);
+
+  function closeCard(){
+    let el = document.getElementById("popup-card");
+    console.log(el);
+    el.className = "card col-3 centered hide";
+  }
   
+  let loadCard = function(title, date, score, link, image=null){
+    let el = document.getElementById("popup-card");
+    el.getElementsByClassName("card-title")[0].innerHTML = date;
+    el.getElementsByClassName("card-body")[0].innerHTML = title;
+    el.getElementsByClassName("img-responsive")[0].src = image;
+
+    el.className = "card col-3 centered";
+  }
 
 
 
@@ -30,14 +44,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
                                      "date": art.data["created_utc"]*1000, 
                                      "downs": art.data["downs"], 
                                      "title": art.data["title"],
-                                     //"image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
+                                     "image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
                                      "comments": art.data["num_comments"] } }) }))
     })).then(val => {
-      //console.log("ALL LOADED!!!", document.getElementById("svg-header").width);
       document.getElementById("svg-main").innerHTML = "";
-      ///document.getElementById("svg-header").innerHTML = "";
       drawTimelines(document.getElementById("svg-main"), [start, stop], val);
-      //drawScaleLines(document.getElementById("svg-header"), [start, stop])
     })
   }
 
@@ -135,16 +146,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.attr("class", "svg");
     svg.attr("width", containerW)
       .attr("height", containerH);
-    
-    
-    /*
-    var x = d3.scaleLinear()
-      .domain([start.getTime(), stop.getTime()])
-      .range([10, (containerW - margin.left - margin.right)])
-      .interpolate(d3.interpolateRound)
-    */
-    console.log(start, stop)
-    
+       
 
     var x = d3.scaleTime()
       .domain([(start),(stop)])
@@ -174,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
-      maxval = Math.max.apply(null, data.map(d => { console.log(); return d["ups"] }));
+      maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
 
       //draw the horizontal axis for each data set
       svg.append("line")
@@ -194,16 +196,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
         });
 
       let onRollOver = function (d, i) {
-        let t = d3.select(this.parentNode)
-        t.selectAll("g > .textbubble").attr("class", "textbubble show");
-        t.selectAll("g > .bubble").attr("class", "bubble-highlight");
-        console.log(t);
+        //let t = d3.select(this.parentNode)
+       // t.selectAll("g > .textbubble").attr("class", "textbubble show");
+       // t.selectAll("g > .bubble").attr("class", "bubble-highlight");
+       
+       loadCard(d["title"], d["date"], d["score"], d["url"], d["image"]);
+        console.log(d );
       }
 
       let onRollOff = function (d, i) {
-        let t = d3.select(this.parentNode)
-        t.select("g > .textbubble").attr("class", "textbubble hide");
-        t.selectAll("g > .bubble-highlight").attr("class", "bubble");
+        //let t = d3.select(this.parentNode)
+        //t.select("g > .textbubble").attr("class", "textbubble hide");
+        //t.selectAll("g > .bubble-highlight").attr("class", "bubble");
       }
 
       bubble = svg.selectAll(".bubbles")
@@ -218,14 +222,13 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .on("mouseout", onRollOff);
 
       let t = bubble.append("text")
-        .attr("class", "textbubble hide")//.attr("class", "textbubble hide")
-        .attr("y", 0)
-        .attr("x", 0)
-        .attr("dx", 20)
-        .attr("text-anchor", "left")
+        .attr("class", "textbubble")//.attr("class", "textbubble hide")
+        .attr("y", -40)
+        .attr("x", -15)
+        .attr("text-anchor", "center")
         .text((d) => {
           let date = new Date(d["date"]);
-          let bubbleObj = (months[date.getMonth()]) + "-" + (date.getDate() + 1) + " " + d["title"];
+          //let bubbleObj = (months[date.getMonth()]) + "-" + (date.getDate() + 1);
           /*
           let bubbleObj = "<table class='bubcontainer'>";
           bubbleObj+= "<tr><td class='bubdate'>"+ (months[date.getMonth()]) + "-" + (date.getDate() + 1) + "</td> <td class='bubpoints'>"; 
@@ -235,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
           */
           //let bubbleObj = " this is a <tspan>test</tspan> system";
 
-          return bubbleObj;
+          //return bubbleObj;
         });
 
 
