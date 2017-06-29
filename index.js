@@ -9,21 +9,27 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
   console.log(document.getElementById("closeCardBtn").onclick);
   document.getElementById("closeCardBtn").onclick = closeCard;
-    console.log(document.getElementById("closeCardBtn").onclick);
+  console.log(document.getElementById("closeCardBtn").onclick);
 
   function closeCard(){
     let el = document.getElementById("popup-card");
     console.log(el);
-    el.className = "card col-3 centered hide";
+    el.className = "card col-6 centered hide";
   }
   
-  let loadCard = function(title, date, score, link, image=null){
+  let loadCard = function(title, date, score, link, domain, image=null){
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
     let el = document.getElementById("popup-card");
-    el.getElementsByClassName("card-title")[0].innerHTML = date;
+    el.getElementsByClassName("card-title")[0].innerHTML = (months[new Date(date).getMonth()]) + "-" + (new Date(date).getDate() + 1);
     el.getElementsByClassName("card-body")[0].innerHTML = title;
     el.getElementsByClassName("img-responsive")[0].src = image;
-
-    el.className = "card col-3 centered";
+    el.getElementsByClassName("card-subtitle")[0].innerHTML = domain;
+    el.getElementsByClassName("card-subtitle2")[0].innerHTML = Math.round(score/1000)+"k points";
+    //el.getElementsByClassName("artlink")[0].href = link;
+    console.log(el.getElementsByClassName("artlink")[0].src)
+    el.getElementsByClassName("artlink")[0].src = link;
+    console.log(el.getElementsByClassName("artlink")[0].src)
+    el.className = "card col-6 centered";
   }
 
 
@@ -44,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                                      "date": art.data["created_utc"]*1000, 
                                      "downs": art.data["downs"], 
                                      "title": art.data["title"],
+                                     "domain": art.data["domain"],
                                      "image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
                                      "comments": art.data["num_comments"] } }) }))
     })).then(val => {
@@ -130,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let drawTimelines = function (svgTarget, dates, dataSets) {
 
     //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
-    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
     let margin = { top: 20, right: 30, bottom: 40, left: 0 };
@@ -200,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
        // t.selectAll("g > .textbubble").attr("class", "textbubble show");
        // t.selectAll("g > .bubble").attr("class", "bubble-highlight");
        
-       loadCard(d["title"], d["date"], d["score"], d["url"], d["image"]);
+       loadCard(d["title"], d["date"], d["score"], d["url"], d["domain"], d["image"]);
         console.log(d );
       }
 
