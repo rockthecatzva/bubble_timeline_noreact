@@ -6,6 +6,7 @@
 body {
     background-color: #eaeaea;
     font-family: mainfont;
+    color: black;
 }
 
 svg:not(:root) {
@@ -53,7 +54,8 @@ svg:not(:root) {
 #svg-main {
     height: 1000px;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
+        margin-top: 3em;
 }
 
 
@@ -135,9 +137,10 @@ svg:not(:root) {
     width: 100%;
 }
 
-.iframe{
-        z-index: 99;
-    background-color: red;
-    width: 600px;
-    height: 400px;
+.tick{
+    font-size: 1.2em;
+}
+
+,maxsize{
+    max-height: 300px;
 }

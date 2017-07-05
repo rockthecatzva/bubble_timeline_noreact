@@ -7,9 +7,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
 
-  console.log(document.getElementById("closeCardBtn").onclick);
+
   document.getElementById("closeCardBtn").onclick = closeCard;
-  console.log(document.getElementById("closeCardBtn").onclick);
 
   function closeCard(){
     let el = document.getElementById("popup-card");
@@ -26,9 +25,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
     el.getElementsByClassName("card-subtitle")[0].innerHTML = domain;
     el.getElementsByClassName("card-subtitle2")[0].innerHTML = Math.round(score/1000)+"k points";
     //el.getElementsByClassName("artlink")[0].href = link;
-    console.log(el.getElementsByClassName("artlink")[0].src)
-    el.getElementsByClassName("artlink")[0].src = link;
-    console.log(el.getElementsByClassName("artlink")[0].src)
+    //console.log(el.getElementsByClassName("artlink")[0].src)
+    //el.getElementsByClassName("artlink")[0].src = link;
+    //console.log(el.getElementsByClassName("artlink")[0].src)
     el.className = "card col-6 centered";
   }
 
@@ -138,14 +137,15 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
     
+
+
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
-    let margin = { top: 20, right: 30, bottom: 40, left: 0 };
+    let margin = { top: 20, right: 30, bottom: 40, left: 100 };
     let height = 10,
-      MARGIN = 10,
       MAXBALLOON_SIZE = 30,
       ROW_GAP = 100,
-      ypos = 100;
+      ypos = 40;
 
     let containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
       containerH = parseInt((window.getComputedStyle(svgTarget).height).replace("px", ""));
@@ -157,14 +157,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     var x = d3.scaleTime()
       .domain([(start),(stop)])
-      .range([0, containerW]);
+      .range([0, containerW-(margin.left+margin.right)]);
 
     var xAxis = d3.axisBottom(x)
       .ticks(d3.timeMonths((start),(stop)).range)
       .tickSize(12, 0)
       .tickFormat(d3.timeFormat("%B"));
-
+    
     var bubbleGroup = svg.append("g")
+      .attr("class", "bubble-group")
+      .attr("transform", "translate("+(margin.left)+", "+margin.top+")");
+      
+    var axisgroup= bubbleGroup.append("g")
       .attr("class", "x axis")
       .style("font-family", "mainfont")
       .attr("transform", "translate(0," + (height - 20) + ")")
@@ -173,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     bubbleGroup.selectAll(".tick text")
       .style("text-anchor", "start")
       .attr("x", 6)
-      .attr("y", 6);
+      .attr("y", -16);
 
 
 
@@ -184,19 +188,26 @@ document.addEventListener("DOMContentLoaded", function (event) {
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
       maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
+      console.log("max val", Math.round(maxval/1000)+"k")
+
+      data = data.sort((a,b)=>{
+        if(a["score"]<b["score"]) return 1;
+        if(a["score"]>b["score"]) return -1;
+        return 0;
+      });
 
       //draw the horizontal axis for each data set
-      svg.append("line")
+      bubbleGroup.append("line")
         .attr("class", "horiz-line")
         .attr("x1", 0)
         .attr("y1", (ypos + ROW_GAP * setnum))
-        .attr("x2", containerW)
+        .attr("x2", containerW-(margin.right+margin.left))
         .attr("y2", (ypos + ROW_GAP * setnum));
 
       //add a label for the subreddit
-      svg.append("foreignObject")
-        .attr("y", (ypos + ROW_GAP * setnum)-45)
-        .attr("x", 8)
+      bubbleGroup.append("foreignObject")
+        .attr("y", (ypos + ROW_GAP * setnum)-15)
+        .attr("x", -100)
         .attr("text-anchor", "left")
         .html((d,i) => {
           return ("<span class='subreddit-label'>/"+subreddits[setnum]+":</span>");
@@ -217,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         //t.selectAll("g > .bubble-highlight").attr("class", "bubble");
       }
 
-      bubble = svg.selectAll(".bubbles")
+      bubble = bubbleGroup.selectAll(".bubbles")
         .data(data)
         .enter().append("g")
         .attr("transform", function (d, i) { return "translate(" + x(d["date"]) + "," + (ypos + ROW_GAP * setnum) + ")"; });
@@ -225,8 +236,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
       bubble.append("circle")
         .attr("class", "bubble")
         .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
-        .on("mouseover", onRollOver)
-        .on("mouseout", onRollOff);
+        .on("click", onRollOver);
+        //.on("mouseout", onRollOff);
 
       let t = bubble.append("text")
         .attr("class", "textbubble")//.attr("class", "textbubble hide")
