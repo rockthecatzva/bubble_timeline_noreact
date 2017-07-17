@@ -7,32 +7,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
 
-
-  document.getElementById("closeCardBtn").onclick = closeCard;
-
-  function closeCard(){
-    let el = document.getElementById("popup-card");
-    console.log(el);
-    el.className = "card col-6 centered hide";
-  }
-  
-  let loadCard = function(title, date, score, link, domain, image=null){
-    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
-    let el = document.getElementById("popup-card");
-    el.getElementsByClassName("card-title")[0].innerHTML = (months[new Date(date).getMonth()]) + "-" + (new Date(date).getDate() + 1);
-    el.getElementsByClassName("card-body")[0].innerHTML = title;
-    el.getElementsByClassName("img-responsive")[0].src = image;
-    el.getElementsByClassName("card-subtitle")[0].innerHTML = domain;
-    el.getElementsByClassName("card-subtitle2")[0].innerHTML = Math.round(score/1000)+"k points";
-    //el.getElementsByClassName("artlink")[0].href = link;
-    //console.log(el.getElementsByClassName("artlink")[0].src)
-    //el.getElementsByClassName("artlink")[0].src = link;
-    //console.log(el.getElementsByClassName("artlink")[0].src)
-    el.className = "card col-6 centered";
-  }
-
-
-
   document.getElementById("submitbutton").onclick = function (event) {
     event.preventDefault();
     let monthdates, url, months, baseurl, timelineData, endurl;
@@ -41,17 +15,21 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     let p = Promise.all(subreddits.map(sub => {
       url = baseurl + sub + endurl;
-      return fetch(url).then(response => response.json().then(dat => 
-                        { return dat.data.children.map(art => 
-                          { return { "url": art.data["url"], 
-                                     "score": art.data["score"], 
-                                     "ups": art.data["ups"], 
-                                     "date": art.data["created_utc"]*1000, 
-                                     "downs": art.data["downs"], 
-                                     "title": art.data["title"],
-                                     "domain": art.data["domain"],
-                                     "image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null), 
-                                     "comments": art.data["num_comments"] } }) }))
+      return fetch(url).then(response => response.json().then(dat => {
+        return dat.data.children.map(art => {
+          return {
+            "url": art.data["url"],
+            "score": art.data["score"],
+            "ups": art.data["ups"],
+            "date": art.data["created_utc"] * 1000,
+            "downs": art.data["downs"],
+            "title": art.data["title"],
+            "domain": art.data["domain"],
+            "image": ((art.data.hasOwnProperty("preview")) ? art.data.preview.images[0].source.url : null),
+            "comments": art.data["num_comments"]
+          }
+        })
+      }))
     })).then(val => {
       document.getElementById("svg-main").innerHTML = "";
       drawTimelines(document.getElementById("svg-main"), [start, stop], val);
@@ -104,40 +82,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
   ac.map((e) => { e.onclick = articleCountButtonClick });
 
   updateYearSelected(selectedYear);
-
-  let drawScaleLines = function (svgTarget, dates) {
-    let svg = d3.select(svgTarget).append("svg"),
-      width = d3.select(svgTarget).node().getBoundingClientRect().width,
-      height = d3.select(svgTarget).node().getBoundingClientRect().height;
-
-    svg.attr("width", width);
-
-    var x = d3.scaleTime()
-      .domain([new Date(dates[0]), new Date(dates[1])])
-      .range([0, width]);
-
-    var xAxis = d3.axisBottom(x)
-      .ticks(d3.timeMonths(new Date(dates[0]), new Date(dates[1])).range)
-      .tickSize(12, 0)
-      .tickFormat(d3.timeFormat("%B"));
-
-    var bubbleGroup = svg.append("g")
-      .attr("class", "x axis")
-      .style("font-family", "mainfont")
-      .attr("transform", "translate(0," + (height - 20) + ")")
-      .call(xAxis);
-
-    bubbleGroup.selectAll(".tick text")
-      .style("text-anchor", "start")
-      .attr("x", 6)
-      .attr("y", 6);
-  }
-
   let drawTimelines = function (svgTarget, dates, dataSets) {
-
-    //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
-    
-
 
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
@@ -153,33 +98,26 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.attr("class", "svg");
     svg.attr("width", containerW)
       .attr("height", containerH);
-       
+    
 
     var x = d3.scaleTime()
-      .domain([(start),(stop)])
-      .range([0, containerW-(margin.left+margin.right)]);
+      .domain([(start), (stop)])
+      .range([0, containerW - (margin.left + margin.right)]);
 
     var xAxis = d3.axisBottom(x)
-      .ticks(d3.timeMonths((start),(stop)).range)
+      .ticks(d3.timeMonths((start), (stop)).range)
       .tickSize(12, 0)
       .tickFormat(d3.timeFormat("%B"));
-    
+
     var bubbleGroup = svg.append("g")
       .attr("class", "bubble-group")
-      .attr("transform", "translate("+(margin.left)+", "+margin.top+")");
-      
-    var axisgroup= bubbleGroup.append("g")
+      .attr("transform", "translate(" + (margin.left) + ", " + margin.top + ")");
+
+    var axisgroup = bubbleGroup.append("g")
       .attr("class", "x axis")
       .style("font-family", "mainfont")
       .attr("transform", "translate(0," + (height - 20) + ")")
       .call(xAxis);
-
-    bubbleGroup.selectAll(".tick text")
-      .style("text-anchor", "start")
-      .attr("x", 6)
-      .attr("y", -16);
-
-
 
 
     svg.selectAll(".bubbles").remove()
@@ -188,11 +126,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
       maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
-      console.log("max val", Math.round(maxval/1000)+"k")
 
-      data = data.sort((a,b)=>{
-        if(a["score"]<b["score"]) return 1;
-        if(a["score"]>b["score"]) return -1;
+      //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
+      data = data.sort((a, b) => {
+        if (a["score"] < b["score"]) return 1;
+        if (a["score"] > b["score"]) return -1;
         return 0;
       });
 
@@ -201,32 +139,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("class", "horiz-line")
         .attr("x1", 0)
         .attr("y1", (ypos + ROW_GAP * setnum))
-        .attr("x2", containerW-(margin.right+margin.left))
+        .attr("x2", containerW - (margin.right + margin.left))
         .attr("y2", (ypos + ROW_GAP * setnum));
 
       //add a label for the subreddit
       bubbleGroup.append("foreignObject")
-        .attr("y", (ypos + ROW_GAP * setnum)-15)
+        .attr("y", (ypos + ROW_GAP * setnum) - 15)
         .attr("x", -100)
         .attr("text-anchor", "left")
-        .html((d,i) => {
-          return ("<span class='subreddit-label'>/"+subreddits[setnum]+":</span>");
+        .html((d, i) => {
+          return ("<span class='subreddit-label'>/" + subreddits[setnum] + ":</span>");
         });
 
-      let onRollOver = function (d, i) {
-        //let t = d3.select(this.parentNode)
-       // t.selectAll("g > .textbubble").attr("class", "textbubble show");
-       // t.selectAll("g > .bubble").attr("class", "bubble-highlight");
-       
-       loadCard(d["title"], d["date"], d["score"], d["url"], d["domain"], d["image"]);
-        console.log(d );
-      }
-
-      let onRollOff = function (d, i) {
-        //let t = d3.select(this.parentNode)
-        //t.select("g > .textbubble").attr("class", "textbubble hide");
-        //t.selectAll("g > .bubble-highlight").attr("class", "bubble");
-      }
 
       bubble = bubbleGroup.selectAll(".bubbles")
         .data(data)
@@ -236,30 +160,21 @@ document.addEventListener("DOMContentLoaded", function (event) {
       bubble.append("circle")
         .attr("class", "bubble")
         .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
-        .on("click", onRollOver);
-        //.on("mouseout", onRollOff);
-
-      let t = bubble.append("text")
-        .attr("class", "textbubble")//.attr("class", "textbubble hide")
-        .attr("y", -40)
-        .attr("x", -15)
-        .attr("text-anchor", "center")
-        .text((d) => {
-          let date = new Date(d["date"]);
-          //let bubbleObj = (months[date.getMonth()]) + "-" + (date.getDate() + 1);
-          /*
-          let bubbleObj = "<table class='bubcontainer'>";
-          bubbleObj+= "<tr><td class='bubdate'>"+ (months[date.getMonth()]) + "-" + (date.getDate() + 1) + "</td> <td class='bubpoints'>"; 
-          bubbleObj+= Math.round(d["score"]/1000)+"k points</td></tr>";
-          bubbleObj+="<tr class='bubtext'><td colspan='2'>" + d["title"] + "</td></tr>";
-          bubbleObj+= "</table>";
-          */
-          //let bubbleObj = " this is a <tspan>test</tspan> system";
-
-          //return bubbleObj;
-        });
-
-
+        .on("mouseover", function(d) {
+					var xPosition = d3.select(this.parentNode);
+					var yPosition = d3.select(this);
+          console.log("making tool tip", xPosition, yPosition);
+					d3.select("#tooltip")
+						.style("left", "0px")
+						.style("top", "0px")
+						.select("#value")
+						.text(()=>{
+              return Math.round(d.score/1000)+"k";});
+					d3.select("#tooltip").classed("hidden", false);
+			   })
+			   .on("mouseout", function() {
+					d3.select("#tooltip").classed("hidden", true);
+			   });
     });
   }
 

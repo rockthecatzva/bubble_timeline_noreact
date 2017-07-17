@@ -7,10 +7,10 @@
 	<link rel="stylesheet" href="style.css" />
 	<script>
 		(function (i, s, o, g, r, a, m) {
-		i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-			(i[r].q = i[r].q || []).push(arguments)		
-}, i[r].l = 1 * new Date(); a = s.createElement(o),
-			m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+			i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date(); a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
 		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
 		ga('create', 'UA-15876167-6', 'auto');
@@ -19,6 +19,11 @@
 </head>
 
 <body class="container">
+	<div id="tooltip" class="hidden">
+		<p><strong>Percentage Value</strong></p>
+		<p><span id="value">100</span>%</p>
+	</div>
+
 	<div class="columns">
 		<div class="column col-12 center-text">
 			<h2>Top Reddit Posts by Year and Sub</h2>
@@ -64,6 +69,7 @@
 		<div class="column col-1"></div>
 	</div>
 
+	<!--
 	<div class="card-container columns">
 		<div id="popup-card" class="card col-6 centered hide">
 			<button id="closeCardBtn" class="btn btn-clear"></button>
@@ -84,6 +90,7 @@
 			</div>
 		</div>
 	</div>
+	-->
 
 </body>
 <script src="dist/bundle.js"></script>
