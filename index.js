@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       if (articleCount < 100) { articleCount++; }
     }
     else {
-      if (articleCount > 0) { articleCount--; }
+      if (articleCount > 1) { articleCount--; }
     }
 
     this.getElementById("articleCountIndicator").innerHTML = articleCount;
@@ -161,12 +161,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("class", "bubble")
         .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
         .on("mouseover", function(d) {
-					var xPosition = d3.select(this.parentNode);
-					var yPosition = d3.select(this);
-          console.log("making tool tip", xPosition, yPosition);
+          d3.select(this).attr("class", "bubble-highlight")
 					d3.select("#tooltip")
-						.style("left", "0px")
-						.style("top", "0px")
+						.style("left", function(){
+              return d3.event.pageX+"px";
+            })
+						.style("top", function(){
+              return d3.event.pageY+"px";
+            })
 						.select("#value")
 						.text(()=>{
               return Math.round(d.score/1000)+"k";});
@@ -174,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			   })
 			   .on("mouseout", function() {
 					d3.select("#tooltip").classed("hidden", true);
+          d3.select(this).attr("class", "bubble")
 			   });
     });
   }

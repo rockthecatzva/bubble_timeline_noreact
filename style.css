@@ -19,16 +19,15 @@ svg:not(:root) {
 
 .bubble-highlight {
     fill: blue;
-        stroke-width: 1;
-    shape-rendering: crispEdges;
-        stroke: #eaeaea;    
+    stroke-width: 1;
+    stroke: #eaeaea;    
 }
 
 .bubble {
     stroke: #eaeaea;
     fill: black;
     stroke-width: 1;
-    shape-rendering: crispEdges;
+   
 }
 
 .yearselect {
@@ -63,16 +62,6 @@ svg:not(:root) {
     display: inherit;
 }
 
-.textbubble {
-    fill: white;
-    stroke: black;
-    font-size: 0.8em;
-    width: 150px;
-    height: 100px;
-    max-height: 120px;
-    overflow: hidden;
-}
-
 
 .horiz-line{
     stroke: black;
@@ -92,9 +81,17 @@ svg:not(:root) {
     color: #50596c;
 }
 
+#articleCountIndicator{
+    width: 3em;
+    border-top: solid 1px;
+    border-bottom: solid 1px;
+    
+}
+
 .articleCount{
     color: #50596c;
     border-color: #50596c;
+    width: 2em;
 }
 
 .center-text{
@@ -128,22 +125,16 @@ svg:not(:root) {
 }
 
 .articlecountbox{
-    width: 78px;
+    width: 9em;
 }
 
-.card-container{
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-}
+
 
 .tick{
     font-size: 1.2em;
 }
 
-,maxsize{
-    max-height: 300px;
-}
+
 
  #tooltip {
       position: absolute;
@@ -151,12 +142,10 @@ svg:not(:root) {
       height: auto;
       padding: 10px;
       background-color: white;
-      -webkit-border-radius: 10px;
-      -moz-border-radius: 10px;
-      border-radius: 10px;
-      -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-      -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      
       pointer-events: none;
     }
 
