@@ -161,6 +161,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("class", "bubble")
         .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
         .on("mouseover", function(d) {
+          console.log(d);
           d3.select(this).attr("class", "bubble-highlight")
 					d3.select("#tooltip")
 						.style("left", function(){
@@ -169,9 +170,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
 						.style("top", function(){
               return d3.event.pageY+"px";
             })
-						.select("#value")
-						.text(()=>{
-              return Math.round(d.score/1000)+"k";});
+						.select("#value").text(()=>{return Math.round(d.score/1000)+"k";});
+          d3.select("#tooltip").select("#url").attr("xlink:href", function(){return d.url});
+          d3.select("#tooltip").select("#title").text(()=>{return d.title});
+          d3.select("#tooltip").select("#date").text(()=>{return (new Date(d.date).getMonth()+1)+"/"+new Date(d.date).getDate()});
 					d3.select("#tooltip").classed("hidden", false);
 			   })
 			   .on("mouseout", function() {
