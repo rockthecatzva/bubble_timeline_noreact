@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
+  let months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+   document.getElementById("close-box").onclick = function(event){
+    console.log("here");
+    d3.select("#tooltip").classed("hidden", true);
+  }
 
   document.getElementById("submitbutton").onclick = function (event) {
     event.preventDefault();
@@ -86,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     let formatDate = d3.timeFormat("%d-%b-%y");
     let svg = d3.select(svgTarget).append("svg");
-    let margin = { top: 20, right: 30, bottom: 40, left: 100 };
+    let margin = { top: 70, right: 30, bottom: 40, left: 100 };
     let height = 10,
       MAXBALLOON_SIZE = 30,
       ROW_GAP = 100,
@@ -121,11 +127,32 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 
     svg.selectAll(".bubbles").remove()
-    var bubble, maxval, textbubble;
+    var bubble, maxval, textbubble, minval;
+
+    //find max among all sets - scale will be consistent for each line
+    let alldat = dataSets[0].concat(...dataSets);   
+    maxval = Math.max.apply(null, alldat.map(d => { return d["score"] }));
+    minval = Math.min.apply(null, alldat.map(d => { return d["score"] }));
+
+
+    //draw graph legend
+    var legendGroup = svg.append("g")
+      .attr("class", "legend-box")
+      .attr("transform", "translate(" + (containerW/2) + ", 0)");
+    
+    legendGroup.append("circle")
+        .attr("class", "bubble")
+        .attr("r", () => { return MAXBALLOON_SIZE })
+        .attr("cx", "100px");
+    
+    legendGroup.append("circle")
+        .attr("class", "bubble")
+        .attr("r", () => { return (minval / maxval) * MAXBALLOON_SIZE })
+        .attr("cx", "10px");
 
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
-      maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
+      //maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
 
       //Sort data by ups - largest to smallest - so when drawing the smaller ones will appear on top
       data = data.sort((a, b) => {
@@ -159,26 +186,28 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       bubble.append("circle")
         .attr("class", "bubble")
-        .attr("r", (d) => { return (d["ups"] / maxval) * MAXBALLOON_SIZE })
-        .on("mouseover", function(d) {
-          console.log(d);
+        .attr("r", (d) => { return (d["score"] / maxval) * MAXBALLOON_SIZE })
+        .on("click", function(d) {
+          d3.selectAll(".bubble-highlight").attr("class", "bubble");
           d3.select(this).attr("class", "bubble-highlight")
 					d3.select("#tooltip")
 						.style("left", function(){
-              return d3.event.pageX+"px";
+              let boxW = document.getElementById('tooltip').clientWidth/2;
+              return (d3.event.pageX-boxW)+"px";
             })
 						.style("top", function(){
-              return d3.event.pageY+"px";
+              let boxH = document.getElementById('tooltip').clientHeight;
+              return (d3.event.pageY-boxH)+"px";
             })
 						.select("#value").text(()=>{return Math.round(d.score/1000)+"k";});
-          d3.select("#tooltip").select("#url").attr("xlink:href", function(){return d.url});
+          d3.select("#tooltip").select("#url").attr(" href", function(){return d.url});
           d3.select("#tooltip").select("#title").text(()=>{return d.title});
-          d3.select("#tooltip").select("#date").text(()=>{return (new Date(d.date).getMonth()+1)+"/"+new Date(d.date).getDate()});
+          d3.select("#tooltip").select("#date").text(()=>{return (months[new Date(d.date).getMonth()])+"-"+new Date(d.date).getDate()});
 					d3.select("#tooltip").classed("hidden", false);
 			   })
 			   .on("mouseout", function() {
-					d3.select("#tooltip").classed("hidden", true);
-          d3.select(this).attr("class", "bubble")
+					//d3.select("#tooltip").classed("hidden", true);
+          //d3.select(this).attr("class", "bubble")
 			   });
     });
   }
