@@ -54,7 +54,6 @@ svg:not(:root) {
     height: 1000px;
     position: relative;
     overflow: hidden;
-        margin-top: 3em;
 }
 
 
@@ -125,7 +124,7 @@ svg:not(:root) {
 }
 
 .articlecountbox{
-    width: 9em;
+    width: 7em;
 }
 
 
@@ -137,6 +136,7 @@ svg:not(:root) {
 
 
  #tooltip {
+        font-size: 0.9em;
       position: absolute;
       width: 200px;
       height: auto;
@@ -145,11 +145,9 @@ svg:not(:root) {
       -webkit-border-radius: 2px;
       -moz-border-radius: 2px;
       border-radius: 2px;
-      
-      pointer-events: none;
     }
 
-    #tooltip.hidden {
+    .hidden {
       display: none;
     }
 
@@ -159,19 +157,70 @@ svg:not(:root) {
       font-size: 16px;
       line-height: 20px;
     }
+    
+
 
     .tool-score{
         float: right;
     }
 
-    .tool-link{
+    #tool-link{
         float: right;
     }
 
-    .tooltip{
-        font-size: 0.9em;
-    }
 
     .divider{
         margin: 5px;
     }
+
+    .close-container{
+        position: relative;
+        height: 20px;
+    }
+
+.legend-label{
+    text-align: center;
+}
+
+#legend-box{
+    width: 160px;
+    height: 120px;
+    border: solid 1px;
+    margin-top: 1em;
+
+    
+      background-color: white;
+      -webkit-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+}
+
+.legend-title{
+    font-size: 0.8em;
+    font-weight: bold;
+    text-decoration: underline;
+    text-align: center;
+}
+
+ .legend-val{
+    width: 50%;
+    float: left;
+    text-align: center;
+    font-size: 0.8em;
+}
+
+#legend-svg circle{
+    fill: grey;
+    stroke: black;
+}
+
+.footnote{
+    color: grey;
+}
+
+.top-title{
+    padding-bottom: 0em;
+    font-size: 3em;
+    padding-top: 0.8em;
+
+}

@@ -22,8 +22,12 @@
 	
 
 	<div class="columns">
+		<div class="column col-12 center-text top-title">
+			<p>Top Reddit Posts by Year and Sub&#42;</p>
+		</div>
+		
 		<div class="column col-12 center-text">
-			<h2>Top Reddit Posts by Year and Sub</h2>
+			<div class="footnote col-6 col-sm-10 centered">&#42; "A submission's score is simply the number of upvotes minus the number of downvotes. If five users like the submission and three users don't it will have a score of 2." via <a href="https://www.reddit.com/wiki/faq" target="_blank">reddit's faq</a></div>
 		</div>
 
 		<div id="formbox" class="column col-3">
@@ -54,10 +58,19 @@
 
 				<div class="instruct">3. Press update button.</div>
 				<input id="submitbutton" class="centered" type="submit" value="Update">
+				<div class="instruct">4. Click a bubble for more information.</div>
 			</form>
 		</div>
 	</div>
 
+	<div class="columns">
+		<div id="legend-box" class="centered hidden">
+			<p class="legend-title">SIZED BY SCORE (POINTS)</p>
+			<div id="legend-svg"></div>
+			<div id="min-val" class="legend-val"></div><div id="max-val" class="legend-val"></div>
+		</div>
+	</div>
+	
 
 	<!-- svg group -->
 	<div class="columns">
@@ -66,9 +79,9 @@
 		<div class="column col-1"></div>
 	</div>
 
-	<div class="tooltip" id="tooltip" class="hidden">
-		<div class="float-right">
-			<button id="close-box" class="btn btn-clear"></button>
+	<div id="tooltip" class="hidden">
+		<div class="close-container">
+			<button id="close-box" class="btn btn-clear float-right"></button>
 		</div>
 		<div class="tool-toprow">
 			<span id="date">4/18</span>
@@ -76,10 +89,13 @@
 		</div>
 		<div class="divider"></div>
 		<div class="tool-title" id="title">Title</div>
-		<a class="tool-link btn btn-primary" href="#">Link</a>
+		<a id="tool-link" target="_blank" class="btn" href="#">Link</a>
 		
 	</div>
+
 	
+
+
 
 </body>
 <script src="dist/bundle.js"></script>

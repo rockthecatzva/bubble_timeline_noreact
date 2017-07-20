@@ -7,14 +7,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
   let months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
+  
    document.getElementById("close-box").onclick = function(event){
-    console.log("here");
     d3.select("#tooltip").classed("hidden", true);
   }
 
   document.getElementById("submitbutton").onclick = function (event) {
     event.preventDefault();
+    d3.select("#tooltip").classed("hidden", true);//hide the tool tip - otherwise will have old info
     let monthdates, url, months, baseurl, timelineData, endurl;
     baseurl = "https://www.reddit.com/r/";
     endurl = "/search.json?sort=top&limit=" + articleCount + "&q=timestamp%3A" + (Math.trunc(start.getTime() / 1000)) + ".." + (Math.trunc(stop.getTime() / 1000)) + "&restrict_sr=on&syntax=cloudsearch";
@@ -88,15 +88,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
   ac.map((e) => { e.onclick = articleCountButtonClick });
 
   updateYearSelected(selectedYear);
-  let drawTimelines = function (svgTarget, dates, dataSets) {
 
+
+  let drawTimelines = function (svgTarget, dates, dataSets) {
     let formatDate = d3.timeFormat("%d-%b-%y");
-    let svg = d3.select(svgTarget).append("svg");
-    let margin = { top: 70, right: 30, bottom: 40, left: 100 };
+    var svg = d3.select(svgTarget).append("svg");
     let height = 10,
       MAXBALLOON_SIZE = 30,
       ROW_GAP = 100,
-      ypos = 40;
+      ypos = 40,
+      tooltipBuffer = -15,
+      
+      margin = { top: 20, right: 30, bottom: 40, left: 100 };
+
 
     let containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
       containerH = parseInt((window.getComputedStyle(svgTarget).height).replace("px", ""));
@@ -104,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.attr("class", "svg");
     svg.attr("width", containerW)
       .attr("height", containerH);
-    
 
     var x = d3.scaleTime()
       .domain([(start), (stop)])
@@ -125,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
       .attr("transform", "translate(0," + (height - 20) + ")")
       .call(xAxis);
 
-
     svg.selectAll(".bubbles").remove()
     var bubble, maxval, textbubble, minval;
 
@@ -134,21 +136,29 @@ document.addEventListener("DOMContentLoaded", function (event) {
     maxval = Math.max.apply(null, alldat.map(d => { return d["score"] }));
     minval = Math.min.apply(null, alldat.map(d => { return d["score"] }));
 
-
-    //draw graph legend
-    var legendGroup = svg.append("g")
-      .attr("class", "legend-box")
-      .attr("transform", "translate(" + (containerW/2) + ", 0)");
+    document.getElementById("min-val").innerHTML = Math.round(minval/1000)+"k";
+    document.getElementById("max-val").innerHTML = Math.round(maxval/1000)+"k";
     
+    //draw graph legend
+    d3.select("#legend-svg").select("svg").remove();
+    var legendGroup = d3.select("#legend-svg").append("svg")
+        .attr("width", "160px")
+        .attr("height", "50px");
+
     legendGroup.append("circle")
         .attr("class", "bubble")
         .attr("r", () => { return MAXBALLOON_SIZE })
-        .attr("cx", "100px");
+        .attr("cy", "25px")
+        .attr("cx", "117px");
     
     legendGroup.append("circle")
         .attr("class", "bubble")
         .attr("r", () => { return (minval / maxval) * MAXBALLOON_SIZE })
-        .attr("cx", "10px");
+        .attr("cx", "40px")
+        .attr("cy", "25px");
+
+    document.getElementById("legend-box").classList.remove('hidden');
+
 
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
@@ -190,6 +200,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .on("click", function(d) {
           d3.selectAll(".bubble-highlight").attr("class", "bubble");
           d3.select(this).attr("class", "bubble-highlight")
+          document.getElementById("tool-link").setAttribute("href", d.url);
+          document.getElementById("title").innerHTML = d.title;
+          document.getElementById("date").innerHTML = (months[new Date(d.date).getMonth()])+"-"+new Date(d.date).getDate();
+					d3.select("#tooltip").classed("hidden", false);
+
 					d3.select("#tooltip")
 						.style("left", function(){
               let boxW = document.getElementById('tooltip').clientWidth/2;
@@ -197,18 +212,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
             })
 						.style("top", function(){
               let boxH = document.getElementById('tooltip').clientHeight;
-              return (d3.event.pageY-boxH)+"px";
+              return (d3.event.pageY-boxH+tooltipBuffer)+"px";
             })
-						.select("#value").text(()=>{return Math.round(d.score/1000)+"k";});
-          d3.select("#tooltip").select("#url").attr(" href", function(){return d.url});
-          d3.select("#tooltip").select("#title").text(()=>{return d.title});
-          d3.select("#tooltip").select("#date").text(()=>{return (months[new Date(d.date).getMonth()])+"-"+new Date(d.date).getDate()});
-					d3.select("#tooltip").classed("hidden", false);
-			   })
-			   .on("mouseout", function() {
-					//d3.select("#tooltip").classed("hidden", true);
-          //d3.select(this).attr("class", "bubble")
+						.select("#value").text(Math.round(d.score/1000)+"k");
 			   });
+			   
     });
   }
 
