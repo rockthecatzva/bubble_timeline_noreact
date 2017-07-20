@@ -157,8 +157,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         .attr("cx", "40px")
         .attr("cy", "25px");
 
-    document.getElementById("legend-box").classList.remove('hidden');
-
+    document.getElementById("hide-box").classList.remove('hidden');
 
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
