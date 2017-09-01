@@ -1,27 +1,53 @@
 let d3 = require('d3');
+var CryptoJS = require("crypto-js");
 
 document.addEventListener("DOMContentLoaded", function (event) {
-  let articleCount = 10;
+  let articleCount = 35;
   let selectedYear = 2017;
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
   let start, stop;
   let subreddits = ["news", "politics", "worldnews", "television", "science"];
   let months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  
-   document.getElementById("close-box").onclick = function(event){
+  let token = "";
+
+  (async () => {
+    let url = "https://www.reddit.com/api/v1/access_token";
+    try {
+      var response = await fetch(url, {
+        method: "post",
+        headers: {
+          'Authorization': "Basic " + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse("TGuKx4Fkfb7ivQ:")),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=DO_NOT_TRACK_THIS_DEVICE"
+      });
+
+      var data = await response.json();
+      token =  {headers: {'Authorization': 'bearer ' + data.access_token }};
+      //console.log(token);
+    } catch (e) {
+      console.log("the initial auth request was rejected", e)
+    }
+  })();
+
+
+
+  document.getElementById("close-box").onclick = function (event) {
     d3.select("#tooltip").classed("hidden", true);
   }
 
   document.getElementById("submitbutton").onclick = function (event) {
+    console.log(token);
     event.preventDefault();
     d3.select("#tooltip").classed("hidden", true);//hide the tool tip - otherwise will have old info
     let monthdates, url, months, baseurl, timelineData, endurl;
-    baseurl = "https://www.reddit.com/r/";
+    
+    baseurl = "https://oauth.reddit.com/r/";
     endurl = "/search.json?sort=top&limit=" + articleCount + "&q=timestamp%3A" + (Math.trunc(start.getTime() / 1000)) + ".." + (Math.trunc(stop.getTime() / 1000)) + "&restrict_sr=on&syntax=cloudsearch";
 
     let p = Promise.all(subreddits.map(sub => {
       url = baseurl + sub + endurl;
-      return fetch(url).then(response => response.json().then(dat => {
+      return fetch(url, token).then(response => response.json().then(dat => {
         return dat.data.children.map(art => {
           return {
             "url": art.data["url"],
@@ -98,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       ROW_GAP = 100,
       ypos = 40,
       tooltipBuffer = -15,
-      
+
       margin = { top: 20, right: 30, bottom: 40, left: 100 };
 
 
@@ -132,30 +158,30 @@ document.addEventListener("DOMContentLoaded", function (event) {
     var bubble, maxval, textbubble, minval;
 
     //find max among all sets - scale will be consistent for each line
-    let alldat = dataSets[0].concat(...dataSets);   
+    let alldat = dataSets[0].concat(...dataSets);
     maxval = Math.max.apply(null, alldat.map(d => { return d["score"] }));
     minval = Math.min.apply(null, alldat.map(d => { return d["score"] }));
 
-    document.getElementById("min-val").innerHTML = Math.round(minval/1000)+"k";
-    document.getElementById("max-val").innerHTML = Math.round(maxval/1000)+"k";
-    
+    document.getElementById("min-val").innerHTML = Math.round(minval / 1000) + "k";
+    document.getElementById("max-val").innerHTML = Math.round(maxval / 1000) + "k";
+
     //draw graph legend
     d3.select("#legend-svg").select("svg").remove();
     var legendGroup = d3.select("#legend-svg").append("svg")
-        .attr("width", "160px")
-        .attr("height", "50px");
+      .attr("width", "160px")
+      .attr("height", "50px");
 
     legendGroup.append("circle")
-        .attr("class", "bubble")
-        .attr("r", () => { return MAXBALLOON_SIZE })
-        .attr("cy", "25px")
-        .attr("cx", "117px");
-    
+      .attr("class", "bubble")
+      .attr("r", () => { return MAXBALLOON_SIZE })
+      .attr("cy", "25px")
+      .attr("cx", "117px");
+
     legendGroup.append("circle")
-        .attr("class", "bubble")
-        .attr("r", () => { return (minval / maxval) * MAXBALLOON_SIZE })
-        .attr("cx", "40px")
-        .attr("cy", "25px");
+      .attr("class", "bubble")
+      .attr("r", () => { return (minval / maxval) * MAXBALLOON_SIZE })
+      .attr("cx", "40px")
+      .attr("cy", "25px");
 
     document.getElementById("hide-box").classList.remove('hidden');
 
@@ -196,26 +222,26 @@ document.addEventListener("DOMContentLoaded", function (event) {
       bubble.append("circle")
         .attr("class", "bubble")
         .attr("r", (d) => { return (d["score"] / maxval) * MAXBALLOON_SIZE })
-        .on("click", function(d) {
+        .on("click", function (d) {
           d3.selectAll(".bubble-highlight").attr("class", "bubble");
           d3.select(this).attr("class", "bubble-highlight")
           document.getElementById("tool-link").setAttribute("href", d.url);
           document.getElementById("title").innerHTML = d.title;
-          document.getElementById("date").innerHTML = (months[new Date(d.date).getMonth()])+"-"+new Date(d.date).getDate();
-					d3.select("#tooltip").classed("hidden", false);
+          document.getElementById("date").innerHTML = (months[new Date(d.date).getMonth()]) + "-" + new Date(d.date).getDate();
+          d3.select("#tooltip").classed("hidden", false);
 
-					d3.select("#tooltip")
-						.style("left", function(){
-              let boxW = document.getElementById('tooltip').clientWidth/2;
-              return (d3.event.pageX-boxW)+"px";
+          d3.select("#tooltip")
+            .style("left", function () {
+              let boxW = document.getElementById('tooltip').clientWidth / 2;
+              return (d3.event.pageX - boxW) + "px";
             })
-						.style("top", function(){
+            .style("top", function () {
               let boxH = document.getElementById('tooltip').clientHeight;
-              return (d3.event.pageY-boxH+tooltipBuffer)+"px";
+              return (d3.event.pageY - boxH + tooltipBuffer) + "px";
             })
-						.select("#value").text(Math.round(d.score/1000)+"k");
-			   });
-			   
+            .select("#value").text(Math.round(d.score / 1000) + "k");
+        });
+
     });
   }
 
