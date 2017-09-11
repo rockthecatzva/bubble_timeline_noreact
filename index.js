@@ -1,17 +1,18 @@
-let d3 = require('d3');
+var d3 = require('d3');
 var CryptoJS = require("crypto-js");
 
 document.addEventListener("DOMContentLoaded", function (event) {
-  let articleCount = 35;
-  let selectedYear = 2017;
+  var articleCount = 35;
+  var selectedYear = 2017;
   this.getElementById("articleCountIndicator").innerHTML = articleCount;
-  let start, stop;
-  let subreddits = ["news", "politics", "worldnews", "television", "science"];
-  let months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  let token = "";
+  var start, stop;
+  var subreddits = ["news", "politics", "worldnews", "television", "science"];
+
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var token = "";
 
   (async () => {
-    let url = "https://www.reddit.com/api/v1/access_token";
+    var url = "https://www.reddit.com/api/v1/access_token";
     try {
       var response = await fetch(url, {
         method: "post",
@@ -23,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       });
 
       var data = await response.json();
-      token =  {headers: {'Authorization': 'bearer ' + data.access_token }};
+      token = { headers: { 'Authorization': 'bearer ' + data.access_token } };
       //console.log(token);
     } catch (e) {
       console.log("the initial auth request was rejected", e)
@@ -40,12 +41,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
     console.log(token);
     event.preventDefault();
     d3.select("#tooltip").classed("hidden", true);//hide the tool tip - otherwise will have old info
-    let monthdates, url, months, baseurl, timelineData, endurl;
-    
+    var monthdates, url, months, baseurl, timelineData, endurl;
+
     baseurl = "https://oauth.reddit.com/r/";
     endurl = "/search.json?sort=top&limit=" + articleCount + "&q=timestamp%3A" + (Math.trunc(start.getTime() / 1000)) + ".." + (Math.trunc(stop.getTime() / 1000)) + "&restrict_sr=on&syntax=cloudsearch";
 
-    let p = Promise.all(subreddits.map(sub => {
+    var p = Promise.all(subreddits.map(sub => {
       url = baseurl + sub + endurl;
       return fetch(url, token).then(response => response.json().then(dat => {
         return dat.data.children.map(art => {
@@ -69,9 +70,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
   }
 
 
-  let updateYearSelected = function (yr) {
+  var updateYearSelected = function (yr) {
     selectedYear = parseInt(yr);
-    let ys = document.getElementsByClassName("yearselect");
+    var ys = document.getElementsByClassName("yearselect");
     ys = Array.prototype.slice.call(ys);
     ys.forEach(function (element) {
       if (element.value != selectedYear) {
@@ -87,12 +88,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
     if (stop > (new Date())) { stop = new Date() };
   }
 
-  let yearButtonClick = (e) => {
+  var yearButtonClick = (e) => {
     e.preventDefault();
     updateYearSelected(e.target.value);
   }
 
-  let articleCountButtonClick = (e) => {
+  var articleCountButtonClick = (e) => {
     e.preventDefault();
 
     if (e.target.value == "plus") {
@@ -105,30 +106,31 @@ document.addEventListener("DOMContentLoaded", function (event) {
     this.getElementById("articleCountIndicator").innerHTML = articleCount;
   }
 
-  let ys = document.getElementsByClassName("yearselect");
+  var ys = document.getElementsByClassName("yearselect");
   ys = Array.prototype.slice.call(ys);
   ys.map((e) => { e.onclick = yearButtonClick });
 
-  let ac = document.getElementsByClassName("articleCount");
+  var ac = document.getElementsByClassName("articleCount");
   ac = Array.prototype.slice.call(ac);
   ac.map((e) => { e.onclick = articleCountButtonClick });
 
   updateYearSelected(selectedYear);
 
 
-  let drawTimelines = function (svgTarget, dates, dataSets) {
-    let formatDate = d3.timeFormat("%d-%b-%y");
+  var drawTimelines = function (svgTarget, dates, dataSets) {
+    var formatDate = d3.timeFormat("%d-%b-%y");
     var svg = d3.select(svgTarget).append("svg");
-    let height = 10,
-      MAXBALLOON_SIZE = 30,
+    const height = 10,
+      maxCirc = 30,
+      minCirc = 4,
       ROW_GAP = 100,
       ypos = 40,
       tooltipBuffer = -15,
 
-      margin = { top: 20, right: 30, bottom: 40, left: 100 };
+      margin = { top: 20, right: 60, bottom: 40, left: 60 };
 
 
-    let containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
+    var containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
       containerH = parseInt((window.getComputedStyle(svgTarget).height).replace("px", ""));
 
     svg.attr("class", "svg");
@@ -137,8 +139,20 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     var x = d3.scaleTime()
       .domain([(start), (stop)])
-      .range([0, containerW - (margin.left + margin.right)]);
+      .range([margin.left, containerW - (margin.right + margin.left)]);
+    //find max among all sets - scale will be consistent for subreddit 
+    var maxval = d3.max(dataSets.map(s => {
+      return d3.max(s, d => d.score);
+    }));
 
+    var minval = d3.min(dataSets.map(s => {
+      return d3.min(s, d => d.score);
+    }));
+
+    var y = d3.scaleLinear()
+      .domain([minval, maxval])
+      .range([minCirc, maxCirc]);
+    
     var xAxis = d3.axisBottom(x)
       .ticks(d3.timeMonths((start), (stop)).range)
       .tickSize(12, 0)
@@ -157,10 +171,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
     svg.selectAll(".bubbles").remove()
     var bubble, maxval, textbubble, minval;
 
-    //find max among all sets - scale will be consistent for each line
-    let alldat = dataSets[0].concat(...dataSets);
-    maxval = Math.max.apply(null, alldat.map(d => { return d["score"] }));
-    minval = Math.min.apply(null, alldat.map(d => { return d["score"] }));
+
 
     document.getElementById("min-val").innerHTML = Math.round(minval / 1000) + "k";
     document.getElementById("max-val").innerHTML = Math.round(maxval / 1000) + "k";
@@ -173,18 +184,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
     legendGroup.append("circle")
       .attr("class", "bubble")
-      .attr("r", () => { return MAXBALLOON_SIZE })
+      .attr("r", () => { return maxCirc })
       .attr("cy", "25px")
       .attr("cx", "117px");
 
     legendGroup.append("circle")
       .attr("class", "bubble")
-      .attr("r", () => { return (minval / maxval) * MAXBALLOON_SIZE })
+      .attr("r", () => { return minCirc })
       .attr("cx", "40px")
       .attr("cy", "25px");
 
     document.getElementById("hide-box").classList.remove('hidden');
 
+    console.log(svg)
     dataSets.forEach((data, setnum) => {
       //each set will have its own scale!
       //maxval = Math.max.apply(null, data.map(d => { return d["ups"] }));
@@ -199,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       //draw the horizontal axis for each data set
       bubbleGroup.append("line")
         .attr("class", "horiz-line")
-        .attr("x1", 0)
+        .attr("x1", margin.left)
         .attr("y1", (ypos + ROW_GAP * setnum))
         .attr("x2", containerW - (margin.right + margin.left))
         .attr("y2", (ypos + ROW_GAP * setnum));
@@ -207,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       //add a label for the subreddit
       bubbleGroup.append("foreignObject")
         .attr("y", (ypos + ROW_GAP * setnum) - 15)
-        .attr("x", -100)
+        .attr("x", -60)
         .attr("text-anchor", "left")
         .html((d, i) => {
           return ("<span class='subreddit-label'>/" + subreddits[setnum] + ":</span>");
@@ -221,26 +233,87 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       bubble.append("circle")
         .attr("class", "bubble")
-        .attr("r", (d) => { return (d["score"] / maxval) * MAXBALLOON_SIZE })
+        .attr("r", (d) => { return y(d["score"])})
         .on("click", function (d) {
           d3.selectAll(".bubble-highlight").attr("class", "bubble");
-          d3.select(this).attr("class", "bubble-highlight")
-          document.getElementById("tool-link").setAttribute("href", d.url);
+          d3.select(this).attr("class", "bubble-highlight");
+
+          console.log(svg);
+          var foWidth = 200,
+              foHeight = 200,
+              tip = {
+                w: 20,
+                h: 20,
+              };
+          
+          d3.selectAll(".foreignOb").remove();
+    
+          
+          var fo = svg.append('foreignObject')
+                      .attr("class", "foreignOb");
+          
+            var div = fo.append('xhtml:div')
+            .append('div')
+            .attr("class", "tooltip");
+            
+            div.append("p")
+              .attr("class","close-row")
+              .html('<button id="close-box" class="btn btn-clear float-right"></button>');
+            
+            div.append("p")
+              .attr("class","top-row")
+              .html('<span class="float-left date">'+new Date(d.date).getMonth()+'</span><span class="float-right score">'+d.score+'</span>');
+
+            div.append('p')
+            .attr('class', 'title')
+            .html(d.title);
+
+            
+          
+          console.log(this.getBoundingClientRect().height, this)
+          var foHeight = this.getBoundingClientRect().height;
+
+          fo.attr('height', foHeight);
+          fo.attr("width", foWidth);
+          fo.attr("transform", "translate("+x(d.date)+","+((ypos+ROW_GAP*setnum)-(foHeight))+")");
+
+          /*
+          svg.insert('polygon', '.svg-tooltip')
+            .attr({
+              'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 " + (t) + ",0 " + tip.w + "," + (-tip.h) + " " + (t / 2) + ",0",
+              'height': foHeight + tip.h,
+              'width': foWidth,
+              'fill': '#D8D8D8',
+              'opacity': 0.75,
+              'transform': 'translate(' + (y(d.score) - tip.w) + ',' + (y(d.score) + tip.h) + ')'
+            });
+            */
+          /*document.getElementById("tool-link").setAttribute("href", d.url);
           document.getElementById("title").innerHTML = d.title;
           document.getElementById("date").innerHTML = (months[new Date(d.date).getMonth()]) + "-" + new Date(d.date).getDate();
           d3.select("#tooltip").classed("hidden", false);
-
+          
+          var circ = this;
           d3.select("#tooltip")
             .style("left", function () {
-              let boxW = document.getElementById('tooltip').clientWidth / 2;
-              return (d3.event.pageX - boxW) + "px";
+              var boxW = document.getElementById('tooltip').clientWidth / 2;
+              return (x(d["date"]) + boxW/2) + "px";
             })
             .style("top", function () {
-              let boxH = document.getElementById('tooltip').clientHeight;
-              return (d3.event.pageY - boxH + tooltipBuffer) + "px";
+              var boxH = document.getElementById('tooltip').clientHeight;
+              console.log(ypos, ROW_GAP, setnum, circ.getBoundingClientRect().top, d3.select(svgTarget).node().getBoundingClientRect().top);
+              var svgoffset= d3.select(svgTarget).node().getBoundingClientRect().top;
+              //var svgoffset = circ.getBoundingClientRect().top;
+              return ((ROW_GAP*setnum) +svgoffset+ypos) + "px";
             })
-            .select("#value").text(Math.round(d.score / 1000) + "k");
+            .select("#value").text(Math.round(d.score / 1000) + "k");*/
+
+
+
         });
+
+
+
 
     });
   }

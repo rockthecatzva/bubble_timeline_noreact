@@ -9,6 +9,24 @@ body {
     color: black;
 }
 
+
+
+.float-left{
+    float: left;
+}
+
+.float-right{
+    float: right;
+}
+
+.title{
+    clear: both;
+}
+
+
+
+
+
 svg:not(:root) {
     overflow: visible;
 }
