@@ -25,17 +25,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
       var data = await response.json();
       token = { headers: { 'Authorization': 'bearer ' + data.access_token } };
-      //console.log(token);
+      
     } catch (e) {
       console.log("the initial auth request was rejected", e)
     }
   })();
 
-
-
-  document.getElementById("close-box").onclick = function (event) {
-    d3.select("#tooltip").classed("hidden", true);
-  }
 
   document.getElementById("submitbutton").onclick = function (event) {
     console.log(token);
@@ -127,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
       ypos = 40,
       tooltipBuffer = -15,
 
-      margin = { top: 20, right: 60, bottom: 40, left: 60 };
+      margin = { top: 100, right: 60, bottom: 40, left: 60 };
 
 
     var containerW = parseInt((window.getComputedStyle(svgTarget).width).replace("px", "")),
@@ -251,62 +246,41 @@ document.addEventListener("DOMContentLoaded", function (event) {
           
           var fo = svg.append('foreignObject')
                       .attr("class", "foreignOb");
+
+          var closefo = function(){d3.selectAll('.foreignOb').remove()};
           
             var div = fo.append('xhtml:div')
             .append('div')
-            .attr("class", "tooltip");
+            .attr("id", "tooltip");
             
-            div.append("p")
+            div.append("div")
               .attr("class","close-row")
-              .html('<button id="close-box" class="btn btn-clear float-right"></button>');
+              .html('<button id="close-box" class="btn btn-clear float-right"></button>')
+              .on("click", function(){d3.selectAll(".foreignOb").remove()});
             
             div.append("p")
               .attr("class","top-row")
-              .html('<span class="float-left date">'+new Date(d.date).getMonth()+'</span><span class="float-right score">'+d.score+'</span>');
+              .html('<span class="float-left date">'+months[new Date(d.date).getMonth()]+' '+new Date(d.date).getDate()+'</span><span class="float-right score">'+Math.round(d.score/1000)+'k</span>');
 
             div.append('p')
             .attr('class', 'title')
             .html(d.title);
 
             
-          
-          console.log(this.getBoundingClientRect().height, this)
-          var foHeight = this.getBoundingClientRect().height;
-
-          fo.attr('height', foHeight);
           fo.attr("width", foWidth);
-          fo.attr("transform", "translate("+x(d.date)+","+((ypos+ROW_GAP*setnum)-(foHeight))+")");
-
-          /*
-          svg.insert('polygon', '.svg-tooltip')
-            .attr({
-              'points': "0,0 0," + foHeight + " " + foWidth + "," + foHeight + " " + foWidth + ",0 " + (t) + ",0 " + tip.w + "," + (-tip.h) + " " + (t / 2) + ",0",
-              'height': foHeight + tip.h,
-              'width': foWidth,
-              'fill': '#D8D8D8',
-              'opacity': 0.75,
-              'transform': 'translate(' + (y(d.score) - tip.w) + ',' + (y(d.score) + tip.h) + ')'
-            });
-            */
-          /*document.getElementById("tool-link").setAttribute("href", d.url);
-          document.getElementById("title").innerHTML = d.title;
-          document.getElementById("date").innerHTML = (months[new Date(d.date).getMonth()]) + "-" + new Date(d.date).getDate();
-          d3.select("#tooltip").classed("hidden", false);
+          var foHeight = document.getElementById("tooltip").clientHeight,
+              ytrans = ROW_GAP*setnum+ypos-foHeight+margin.top;
+          fo.attr('height', foHeight);
+      
+          fo.attr("transform", "translate("+x(d.date)+margin.left+","+ytrans+")");
           
-          var circ = this;
-          d3.select("#tooltip")
-            .style("left", function () {
-              var boxW = document.getElementById('tooltip').clientWidth / 2;
-              return (x(d["date"]) + boxW/2) + "px";
-            })
-            .style("top", function () {
-              var boxH = document.getElementById('tooltip').clientHeight;
-              console.log(ypos, ROW_GAP, setnum, circ.getBoundingClientRect().top, d3.select(svgTarget).node().getBoundingClientRect().top);
-              var svgoffset= d3.select(svgTarget).node().getBoundingClientRect().top;
-              //var svgoffset = circ.getBoundingClientRect().top;
-              return ((ROW_GAP*setnum) +svgoffset+ypos) + "px";
-            })
-            .select("#value").text(Math.round(d.score / 1000) + "k");*/
+          fo.append('path')
+          .attr('d', function(d) { 
+            var x = 100, y = 100;
+            return 'M ' + x +' '+ y + ' l 4 4 l -8 0 z';
+          });
+
+          
 
 
 

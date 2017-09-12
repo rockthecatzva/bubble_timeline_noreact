@@ -25,12 +25,6 @@ body {
 
 
 
-
-
-svg:not(:root) {
-    overflow: visible;
-}
-
 .tick line {
     stroke: #c5c5c5;
 }
@@ -71,7 +65,7 @@ svg:not(:root) {
 #svg-main {
     height: 1000px;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 
@@ -151,16 +145,14 @@ svg:not(:root) {
 
 
  #tooltip {
-        font-size: 0.9em;
-      position: absolute;
       width: 200px;
-      height: auto;
-      padding: 10px;
       background-color: white;
       -webkit-border-radius: 2px;
       -moz-border-radius: 2px;
       border-radius: 2px;
     }
+
+
 
     .hidden {
       display: none;
@@ -168,12 +160,18 @@ svg:not(:root) {
 
     #tooltip p {
       margin: 0;
-      font-family: Futura;
-      font-size: 16px;
-      line-height: 20px;
+      font-size: 0.8em;
+      
     }
     
-
+    .arrow-down {
+        width: 0; 
+        height: 0; 
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        
+        border-top: 20px solid #f00;
+      }
 
     .tool-score{
         float: right;
